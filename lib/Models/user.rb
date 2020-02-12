@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
     has_many :portfolios
     has_many :stocks, through: :portfolios
 
-    def get_symbols_portfolio
+    def  get_portfolio_stocks
         user_id = self.id 
         array = Portfolio.where(user_id: user_id)
         
@@ -12,17 +12,31 @@ class User < ActiveRecord::Base
         output = stock_ids.map do |id|
             Stock.where("id = ?", id)
         end
-        
-        new_array = output.map do |x, y|
-             x.symbol
+    end 
+
+    def get_symbols_portfolio
+        output = get_portfolio_stocks
+
+        market_value = get_portfolio_stocks.sum do |stock, y|
+            stock.price
         end 
-        if new_array == []
-            puts "Porfolio is empty."
+        stock_and_price = output.map do |x, y|
+             "#{x.symbol}  $#{x.price}"
+        end 
+
+        symbols = output.map do |x, y|
+            "#{x.symbol}"
+       end 
+        if stock_and_price == []
+            puts "\n" * 10
+            puts "Your portfolio is empty."
         else 
-            puts "\n" * 80
+            puts "\n" * 10
             puts "Your porfolio has these stocks:"
-            puts new_array
+            puts stock_and_price
+            puts "\nYour Total Portfolio Market Value: $#{market_value}"
         end 
+        symbols
     end 
 
     def look_up(symbol)
@@ -56,6 +70,15 @@ class User < ActiveRecord::Base
             "X-RapidAPI-Host" => "finnhub-realtime-stock-price.p.rapidapi.com",
             "X-RapidAPI-Key" => "dafb7f16bbmsh88ffcdd851dbd91p135ccbjsn8936bcff69ee"
         }
+        puts "\n" * 40
+        puts "#{symbol} earnings for the last 4 quarters:\n
+        "
+        puts "  EPS |  DATE"
+        puts "$#{response.body[0]["actual"]} | #{response.body[0]["period"]}"
+        puts "$#{response.body[1]["actual"]} | #{response.body[1]["period"]}"
+        puts "$#{response.body[2]["actual"]} | #{response.body[2]["period"]}"
+        puts "$#{response.body[3]["actual"]} | #{response.body[3]["period"]}"
+        
         
     end 
 
@@ -65,12 +88,15 @@ class User < ActiveRecord::Base
             "X-RapidAPI-Host" => "finnhub-realtime-stock-price.p.rapidapi.com",
             "X-RapidAPI-Key" => "dafb7f16bbmsh88ffcdd851dbd91p135ccbjsn8936bcff69ee"
         }
-        puts "#{symbol} analyst recommendations for this month:"
+        puts "\n" * 40
+        puts "#{symbol} analyst recommendations for this month:
+        "
         puts "BUY: #{response.body[0]["buy"]}"
         puts "HOLD: #{response.body[0]["hold"]}"
         puts "SELL: #{response.body[0]["sell"]}"
         puts "STRONG BUY: #{response.body[0]["strongBuy"]}"
         puts "STRONG SELL: #{response.body[0]["strongSell"]}"
+        
         # binding.pry
 
         
@@ -92,18 +118,23 @@ class User < ActiveRecord::Base
     end 
 
     def sell_stock(symbol)
-        response = look_up(symbol)
-        if response != nil 
+
+        if !get_symbols_portfolio.any? do |stock|
+            stock == symbol.upcase
+            end
+            puts "You don't own #{symbol} stock."
+        else 
+        
             stock = Stock.find_by(symbol: symbol)
             id = stock.id
-            puts self.stocks
-
+            
             other = self.portfolios.find_by(stock_id: id)
             other.destroy
             puts "\n" * 80
             puts FONT.write("#{symbol}")  
             puts "You just sold #{symbol} stock."
         end 
+        
     end 
 
     def most_bought_stock

@@ -82,6 +82,7 @@ class CommandLineInterface < User
                 @user.buy_stock(symbol.upcase)
             when "3"
                 @user.get_symbols_portfolio
+                portfolio_menu
             when "4"
                 @user.most_bought_stock
             when "5"
@@ -118,6 +119,46 @@ class CommandLineInterface < User
             puts "Wrong command"
             back_to_menu
         end 
+    end 
+
+    def portfolio_menu
+        puts "
+        PORTFOLIO MENU:
+
+            1) Buy Stock
+            2) Sell Stock
+            3) Get Stock Earnings
+            4) Get Analyst Recommendations
+            5) Main Menu"
+            @portfolio_input = PROMPT.ask("Please choose a number\n")
+            portfolio_menu_case
+            
+    end 
+
+    def portfolio_menu_case
+        case @portfolio_input
+            when "1"
+                symbol = PROMPT.ask("Type in a stock symbol\n")
+                @user.buy_stock(symbol.upcase)
+            when "2"
+                symbol = PROMPT.ask("Type in a stock symbol\n")
+                @user.sell_stock(symbol.upcase)
+            when "3"
+                symbol = PROMPT.ask("Type in a stock symbol\n")
+                @user.look_up_earnings(symbol.upcase)
+            when "4"
+                symbol = PROMPT.ask("Type in a stock symbol\n")
+                @user.get_analyst_recommendations(symbol.upcase)
+            when "5"
+                choose_action
+            else 
+                puts "Wrong command"
+                portfolio_menu
+        end 
+        @user.get_symbols_portfolio
+        portfolio_menu
+
+        
     end 
         
     
