@@ -33,7 +33,12 @@ class CommandLineInterface < User
 
         if !@user
             puts "Wrong username, try again."
-            log_in
+            input = PROMPT.ask("Or type c to create account")
+            if input == "c"
+                create_account
+            else 
+                log_in
+            end
         else 
             get_password
         end 
