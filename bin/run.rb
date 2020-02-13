@@ -14,13 +14,13 @@ cli.account?
 
 
 
-# cli.stock_lookup
 
-binding.pry
 
-puts "h"
+# binding.pry
 
-# symbol = gets.chomp
+# puts "h"
+
+
 
 
 

@@ -90,6 +90,7 @@ class User < ActiveRecord::Base
                 percent_change: response.body["price"]["regularMarketChange"]["raw"]
             }
         else 
+            puts "\n" * 80
             puts "Invalid stock symbol"
             
         end 
@@ -111,6 +112,7 @@ class User < ActiveRecord::Base
             puts "$#{response.body[2]["actual"]} | #{response.body[2]["period"]}"
             puts "$#{response.body[3]["actual"]} | #{response.body[3]["period"]}"
         else 
+            puts "\n" * 80
             puts "Invalid symbol, try again."
         end 
         
@@ -133,6 +135,7 @@ class User < ActiveRecord::Base
             puts "STRONG BUY: #{response.body[0]["strongBuy"]}"
             puts "STRONG SELL: #{response.body[0]["strongSell"]}"
         else 
+            puts "\n" * 80
             puts "Invalid symbol, try again."
         end 
         
@@ -175,21 +178,21 @@ class User < ActiveRecord::Base
         if !get_symbols_portfolio.any? do |stock1|
             stock1 == symbol.upcase
             end
-            puts "\n" * 40
+            puts "\n" * 80
             puts "You don't own #{symbol} stock."
             
         elsif shares > user_stock.shares
-            puts "\n" * 30
+            puts "\n" * 80
             puts "You don't have enough shares."
         elsif shares < user_stock.shares
             stock_shares = user_stock.shares
             user_stock.update(shares: stock_shares - shares)
-            puts "\n" * 10
+            puts "\n" * 80
             puts FONT.write("#{symbol}")  
             puts "You just sold #{shares} #{symbol} shares."
         else shares = user_stock.shares
            user_stock.destroy
-           puts "\n" * 10
+            puts "\n" * 60
             puts FONT.write("#{symbol}")  
             puts "You just sold #{shares} #{symbol} shares."
         end

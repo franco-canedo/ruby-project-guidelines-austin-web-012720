@@ -60,26 +60,17 @@ class CommandLineInterface < User
     end 
 
     def choose_action
-        puts "\n" 
+        puts "\n" *80
         puts "Welcome #{@user.name}!"
-        puts "
-        
-        MAIN MENU:
-
-            1) Look Up a Stock
-            2) Buy Stock
-            3) View your Porfolio
-            4) View Most popular stock
-            5) Sell a stock
-            6) Log out\n"
-            @input = PROMPT.ask("Please choose a number\n")
-            perform_action
+        choice = %w(Look_Up_Stock Buy_Stock View_Your_Portfolio View_Most_Popular_Stock Sell_Stock Log_Out)
+        @input = PROMPT.select("Please choose an option", choice)
+        perform_action
     end 
         
             
     def perform_action
         case @input
-            when "1"
+            when "Look_Up_Stock"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 response = @user.look_up(symbol.upcase)
                
@@ -87,20 +78,20 @@ class CommandLineInterface < User
                     symbol = PROMPT.ask("Type in a stock symbol\n")
                     response = @user.look_up(symbol.upcase)
                 end 
-            when "2"
+            when "Buy_Stock"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 shares = PROMPT.ask("Type in number of shares\n")
                 @user.buy_stock(symbol.upcase, shares)
-            when "3"
+            when "View_Your_Portfolio"
                 @user.get_symbols_portfolio
                 portfolio_menu
-            when "4"
+            when "View_Most_Popular_Stock"
                 @user.most_bought_stock
-            when "5"
+            when "Sell_Stock"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 shares = PROMPT.ask("Type in number of shares\n")
                 @user.sell_stock(symbol.upcase, shares)
-            when "6"
+            when "Log_Out"
                 @user = nil
                 puts "\n" * 80
                 puts "YOU HAVE BEEN LOGGED OUT!"
@@ -118,12 +109,12 @@ class CommandLineInterface < User
     end 
 
     def back_to_menu
-        response = PROMPT.ask("
-        Press M for Main Menu\n
-        Press Q to log out.\n")
-        if response.upcase == "M" 
+        choices = %w(Main_Menu Log_Out)
+        response = PROMPT.select("Options", choices)
+        
+        if response == "Main_Menu" 
             choose_action
-        elsif response.upcase == "Q"
+        elsif response == "Log_Out"
             @user = nil
             puts "Goodbye"
             greet
@@ -135,36 +126,28 @@ class CommandLineInterface < User
     end 
 
     def portfolio_menu
-        puts "
-        PORTFOLIO MENU:
-
-            1) Buy Stock
-            2) Sell Stock
-            3) Get Stock Earnings
-            4) Get Analyst Recommendations
-            5) Main Menu"
-            @portfolio_input = PROMPT.ask("Please choose a number\n")
-            portfolio_menu_case
-            
+        choices = %w(Buy_Stock Sell_Stock Get_Stock_Earnings Get_Analyst_Recommendations Main_Menu)
+        @portfolio_input = PROMPT.select("Please choose an uption", choices)
+        portfolio_menu_case      
     end 
 
     def portfolio_menu_case
         case @portfolio_input
-            when "1"
+            when "Buy_Stock"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 shares = PROMPT.ask("Type in number of shares\n")
                 @user.buy_stock(symbol.upcase, shares)
-            when "2"
+            when "Sell_Stock"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 shares = PROMPT.ask("Type in number of shares\n")
                 @user.sell_stock(symbol.upcase, shares)
-            when "3"
+            when "Get_Stock_Earnings"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 @user.look_up_earnings(symbol.upcase)
-            when "4"
+            when "Get_Analyst_Recommendations"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 @user.get_analyst_recommendations(symbol.upcase)
-            when "5"
+            when "Main_Menu"
                 choose_action
             else 
                 puts "Wrong command"
