@@ -2,28 +2,52 @@ class User < ActiveRecord::Base
     has_many :portfolios
     has_many :stocks, through: :portfolios
 
-    def  get_portfolio_stocks
+    def get_stock_ids_user
         user_id = self.id 
         array = Portfolio.where(user_id: user_id)
         
         stock_ids = array.map do |relationship|
             relationship.stock_id
         end 
-        output = stock_ids.map do |id|
+    end 
+
+    def get_stock_shares(stock_id) 
+        user_stock = Portfolio.find_by(user_id: self.id, stock_id: stock_id)
+        user_stock.shares
+    end 
+
+    def  get_portfolio_stocks
+        
+        output = get_stock_ids_user.map do |id|
             Stock.where("id = ?", id)
         end
     end 
 
     def get_symbols_portfolio
         output = get_portfolio_stocks
-
+        
         market_value = get_portfolio_stocks.sum do |stock, y|
             stock.price
         end 
+        
         stock_and_price = output.map do |x, y|
-             "#{x.symbol}  $#{x.price}"
+            [x.symbol, x.price]
+        end 
+        # binding.pry
+
+        shares_array = output.map do |stock, x|
+            get_stock_shares(stock.id)
+        end  
+        i = 0
+        portfolio = stock_and_price.each do |stock|
+            
+            stock.push(shares_array[i])
+            i = i + 1
         end 
 
+
+
+        # binding.pry
         symbols = output.map do |x, y|
             "#{x.symbol}"
        end 
@@ -33,7 +57,9 @@ class User < ActiveRecord::Base
         else 
             puts "\n" * 10
             puts "Your porfolio has these stocks:"
-            puts stock_and_price
+            portfolio.each do |stock|
+                puts "#{stock[0]} $#{stock[1]}  #{stock[2]} shares"
+            end 
             puts "\nYour Total Portfolio Market Value: $#{market_value}"
         end 
         symbols
@@ -102,40 +128,76 @@ class User < ActiveRecord::Base
         
     end 
 
-   
-
-    def buy_stock(symbol)
+   def buy_stock(symbol, shares)
         hash = look_up(symbol)
         if hash != nil
             stock = Stock.find_or_create_by(symbol: hash[:symbol])
             stock.update(price: hash[:price])
             stock.update(percent_change: hash[:percent_change])
-            Portfolio.create(user_id: self.id, stock_id: stock.id)
+            user_stock = Portfolio.find_or_create_by(user_id: self.id, stock_id: stock.id)
+            if user_stock.shares == nil
+                user_stock.update(shares: 0)
+                stock_shares = user_stock.shares
+                user_stock.update(shares: stock_shares + shares.to_f)
+
+            else 
+                stock_shares = user_stock.shares
+                user_stock.update(shares: stock_shares + shares.to_f)
+            end 
             puts "\n" * 80
             puts FONT.write("#{symbol}") 
-            puts "You bought #{symbol} stock."
+            puts "You bought #{shares} shares of #{symbol} stock."
         end
     end 
 
-    def sell_stock(symbol)
-
-        if !get_symbols_portfolio.any? do |stock|
-            stock == symbol.upcase
-            end
-            puts "You don't own #{symbol} stock."
-        else 
-        
-            stock = Stock.find_by(symbol: symbol)
-            id = stock.id
+    def sell_stock(symbol, shares)
+        stock = Stock.find_by(symbol: symbol)
+        id = stock.id
             
-            other = self.portfolios.find_by(stock_id: id)
-            other.destroy
-            puts "\n" * 80
+        user_stock = self.portfolios.find_by(stock_id: id)
+        shares = shares.to_f
+
+        if !get_symbols_portfolio.any? do |stock1|
+            stock1 == symbol.upcase
+            end
+            puts "\n" * 40
+            puts "You don't own #{symbol} stock."
+            
+        elsif shares > user_stock.shares
+            puts "\n" * 30
+            puts "You don't have enough shares."
+        elsif shares < user_stock.shares
+            stock_shares = user_stock.shares
+            user_stock.update(shares: stock_shares - shares)
+            puts "\n" * 10
             puts FONT.write("#{symbol}")  
-            puts "You just sold #{symbol} stock."
-        end 
-        
+            puts "You just sold #{shares} #{symbol} shares."
+        else shares = user_stock.shares
+           user_stock.destroy
+           puts "\n" * 10
+            puts FONT.write("#{symbol}")  
+            puts "You just sold #{shares} #{symbol} shares."
+        end
     end 
+
+    # def shares_conditional(user_stock, shares, symbol)
+    #     case shares
+            
+    #     when shares > user_stock.shares
+    #         binding.pry
+
+    #         puts "You don't have enough shares."
+    #     when shares < user_stock.shares
+    #         stock_shares = user_stock.shares
+    #         user_stock.update(shares: stock_shares - shares)
+    #     when shares = user_stock.shares
+    #         user_stock.destroy
+    #     end 
+    #     binding.pry
+    #     puts "\n" * 80
+    #     puts FONT.write("#{symbol}")  
+    #     puts "You just sold #{symbol} stock."
+    # end 
 
     def most_bought_stock
         new_stock = Stock.all.max_by do |stock|

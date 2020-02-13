@@ -79,7 +79,8 @@ class CommandLineInterface < User
                 end 
             when "2"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
-                @user.buy_stock(symbol.upcase)
+                shares = PROMPT.ask("Type in number of shares\n")
+                @user.buy_stock(symbol.upcase, shares)
             when "3"
                 @user.get_symbols_portfolio
                 portfolio_menu
@@ -87,7 +88,8 @@ class CommandLineInterface < User
                 @user.most_bought_stock
             when "5"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
-                @user.sell_stock(symbol.upcase)
+                shares = PROMPT.ask("Type in number of shares\n")
+                @user.sell_stock(symbol.upcase, shares)
             when "6"
                 @user = nil
                 puts "\n" * 80
@@ -139,10 +141,12 @@ class CommandLineInterface < User
         case @portfolio_input
             when "1"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
-                @user.buy_stock(symbol.upcase)
+                shares = PROMPT.ask("Type in number of shares\n")
+                @user.buy_stock(symbol.upcase, shares)
             when "2"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
-                @user.sell_stock(symbol.upcase)
+                shares = PROMPT.ask("Type in number of shares\n")
+                @user.sell_stock(symbol.upcase, shares)
             when "3"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 @user.look_up_earnings(symbol.upcase)
