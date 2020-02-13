@@ -13,6 +13,7 @@
   ## How to install & play
 Download and clone this repository.
 Run 'Bundle install' to install the required gems.
+Run 'rake db:migrate' to migrate tables to database. 
 Run 'ruby  bin/run.rb'
 
 
