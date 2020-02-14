@@ -12,6 +12,9 @@ msft = Stock.create(symbol: "MSFT", price: 100, percent_change: 0.10)
 mike_aapl = Portfolio.create(user_id: mike.id, stock_id: aapl.id, shares: 10)
 mike_msft = Portfolio.create(user_id: mike.id, stock_id: msft.id, shares: 20)
 
+stock = Watchlist.find_or_create_by(symbol: aapl.symbol, user_id: mike.id)
+stock2 = Watchlist.find_or_create_by(symbol: msft.symbol, user_id: mike.id)
+
 carlos_aapl = Portfolio.create(user_id: carlos.id, stock_id: aapl.id)
 
 

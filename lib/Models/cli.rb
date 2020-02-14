@@ -126,7 +126,7 @@ class CommandLineInterface < User
     end 
 
     def portfolio_menu
-        choices = %w(Buy_Stock Sell_Stock Get_Stock_Earnings Get_Analyst_Recommendations Main_Menu)
+        choices = %w(Buy_Stock Sell_Stock View_Watchlist Get_Stock_Earnings Get_Analyst_Recommendations Main_Menu)
         @portfolio_input = PROMPT.select("Please choose an uption", choices)
         portfolio_menu_case      
     end 
@@ -141,6 +141,9 @@ class CommandLineInterface < User
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 shares = PROMPT.ask("Type in number of shares\n")
                 @user.sell_stock(symbol.upcase, shares)
+            when "View_Watchlist"
+                @user.watchlist_stocks
+                watchlist_menu
             when "Get_Stock_Earnings"
                 symbol = PROMPT.ask("Type in a stock symbol\n")
                 @user.look_up_earnings(symbol.upcase)
@@ -157,6 +160,26 @@ class CommandLineInterface < User
         portfolio_menu
 
         
+    end 
+
+    def watchlist_menu
+        choices = %w(Add_Stock Remove_Stock Portfolio_Menu)
+        puts "\n"
+        input = PROMPT.select("Please choose an uption", choices)
+        case input 
+            when "Add_Stock"
+                symbol = PROMPT.ask("Type in a symbol")
+                message = PROMPT.ask("Type a message")
+                @user.add_stock_watchlist(symbol.upcase, message)
+            when "Remove_Stock"
+                symbol = PROMPT.ask("Type in a symbol")
+                @user.remove_stock_watchlist(symbol.upcase)
+            when "Portfolio_Menu"
+                @user.get_symbols_portfolio
+                portfolio_menu
+        end 
+        @user.watchlist_stocks
+        watchlist_menu
     end 
         
     

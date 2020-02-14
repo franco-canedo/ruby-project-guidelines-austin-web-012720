@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200212191846) do
+ActiveRecord::Schema.define(version: 20200214145454) do
 
   create_table "portfolios", force: :cascade do |t|
     t.integer "user_id"
@@ -27,6 +27,13 @@ ActiveRecord::Schema.define(version: 20200212191846) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "password"
+  end
+
+  create_table "watchlists", force: :cascade do |t|
+    t.string  "symbol"
+    t.integer "price"
+    t.integer "user_id"
+    t.string  "message"
   end
 
 end
